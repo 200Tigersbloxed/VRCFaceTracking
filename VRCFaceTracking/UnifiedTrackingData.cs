@@ -8,6 +8,7 @@ using VRCFaceTracking.Params;
 using VRCFaceTracking.Params.Eye;
 using VRCFaceTracking.Params.LipMerging;
 using VRCFaceTracking.Pimax;
+using VRCFaceTracking.TrackingLibs.Omnicept;
 
 namespace VRCFaceTracking
 {
@@ -19,6 +20,7 @@ namespace VRCFaceTracking
         public float Widen, Squeeze;
 
         
+        // SRanipal
         public void Update(SingleEyeData eyeData, SingleEyeExpression? expression = null)
         {
             Look = null;
@@ -39,10 +41,27 @@ namespace VRCFaceTracking
             Squeeze = expression.Value.eye_squeeze;
         }
 
+        // Pimax
         public void Update(EyeExpressionState eyeState)
         {
             Look = new Vector2(eyeState.PupilCenterX, eyeState.PupilCenterY);
             Openness = eyeState.Openness;
+            Widen = 0;
+            Squeeze = 0;
+        }
+
+        // HP Omnicept
+        public void Update(HP.Omnicept.Messaging.Messages.Eye eyeData)
+        {
+            Look = new Vector2(eyeData.Gaze.X, eyeData.Gaze.Y);
+            Openness = eyeData.Openness;
+            Widen = 0;
+            Squeeze = 0;
+        }
+        public void Update(OmniceptTrackingInterface.FakeOmniceptCombinedEye eyeData)
+        {
+            Look = new Vector2(eyeData.Gaze.X, eyeData.Gaze.Y);
+            Openness = eyeData.Openness;
             Widen = 0;
             Squeeze = 0;
         }
@@ -57,6 +76,7 @@ namespace VRCFaceTracking
         private float _maxDilation, _minDilation;
 
 
+        // SRanipal
         public void UpdateData(EyeData_v2 eyeData)
         {
             float dilation = 0;
@@ -82,11 +102,25 @@ namespace VRCFaceTracking
                 EyesDilation = dilation / _minDilation / (_maxDilation - _minDilation);
         }
 
+        // Pimax
         public void UpdateData(Ai1EyeData eyeData)
         {
             Left.Update(eyeData.Left);
             Right.Update(eyeData.Right);
             Combined.Update(eyeData.Recommended);
+        }
+        
+        // HP Omnicept
+        public void UpdateData(HP.Omnicept.Messaging.Messages.Eye leftEye, HP.Omnicept.Messaging.Messages.Eye rightEye,
+            OmniceptTrackingInterface.FakeOmniceptCombinedEye combinedEye)
+        {
+            // Not sure if the min-max dilation has to be done here...
+            // Dilation is measured from 1.5 - 8 in mm (according to the Omnicept Simulator), so we need to make it [0-1]
+            float real_dilation = (combinedEye.PupilDilation - 1.5f) / 6.5f;
+            EyesDilation = real_dilation;
+            Left.Update(leftEye);
+            Right.Update(rightEye);
+            Combined.Update(combinedEye);
         }
 
         private void UpdateMinMaxDilation(float readDilation)

@@ -60,45 +60,56 @@ namespace VRCFaceTracking
         {
             IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
 
-            var trackingModules = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(type => typeof(ITrackingModule).IsAssignableFrom(type) && !type.IsInterface);
-
-            foreach (var module in trackingModules)
+            IEnumerable<Type> trackingModules = null;
+            try
             {
-                bool eyeSuccess = false, lipSuccess = false;    // Init result for every 
-                
-                var moduleObj = (ITrackingModule) Activator.CreateInstance(module);
-                // If there is still a need for a module with eye or lip tracking and this module supports the current need, try initialize it
-                if (!EyeEnabled && moduleObj.SupportsEye || !LipEnabled && moduleObj.SupportsLip)
-                    (eyeSuccess, lipSuccess) = moduleObj.Initialize(eye, lip);
+                trackingModules = Assembly.GetExecutingAssembly().GetExportedTypes()
+                    .Where(type => typeof(ITrackingModule).IsAssignableFrom(type) && !type.IsInterface);
+            }
+            catch (Exception e)
+            {
+                MelonLogger.Error(e.ToString());
+            }
 
-                // If the module successfully initialized anything, add it to the list of useful modules and start its update thread
-                if ((eyeSuccess || lipSuccess) && !UsefulModules.ContainsKey(module))
+            if (trackingModules != null)
+            {
+                foreach (var module in trackingModules)
                 {
-                    UsefulModules.Add(module, moduleObj);
-                    if (ShouldThread)
-                        moduleObj.StartThread();
+                    bool eyeSuccess = false, lipSuccess = false;    // Init result for every 
+                
+                    var moduleObj = (ITrackingModule) Activator.CreateInstance(module);
+                    // If there is still a need for a module with eye or lip tracking and this module supports the current need, try initialize it
+                    if (!EyeEnabled && moduleObj.SupportsEye || !LipEnabled && moduleObj.SupportsLip)
+                        (eyeSuccess, lipSuccess) = moduleObj.Initialize(eye, lip);
+
+                    // If the module successfully initialized anything, add it to the list of useful modules and start its update thread
+                    if ((eyeSuccess || lipSuccess) && !UsefulModules.ContainsKey(module))
+                    {
+                        UsefulModules.Add(module, moduleObj);
+                        if (ShouldThread)
+                            moduleObj.StartThread();
+                    }
+
+                    if (eyeSuccess) EyeEnabled = true;
+                    if (lipSuccess) LipEnabled = true;
+
+                    if (EyeEnabled && LipEnabled) break;    // Keep enumerating over all modules until we find ones we can use
+                }
+                
+                if (eye)
+                    MelonLogger.Msg(EyeEnabled
+                        ? "Eye Tracking Initialized"
+                        : "Eye Tracking will be unavailable for this session.");
+
+                if (lip)
+                {
+                    if (LipEnabled) MelonLogger.Msg("Lip Tracking Initialized");
+                    else MelonLogger.Warning("Lip Tracking will be unavailable for this session.");
                 }
 
-                if (eyeSuccess) EyeEnabled = true;
-                if (lipSuccess) LipEnabled = true;
-
-                if (EyeEnabled && LipEnabled) break;    // Keep enumerating over all modules until we find ones we can use
+                if (SceneManager.GetActiveScene().buildIndex == -1 && QuickModeMenu.MainMenu != null)
+                    MainMod.MainThreadExecutionQueue.Add(() => QuickModeMenu.MainMenu.UpdateEnabledTabs(EyeEnabled, LipEnabled));
             }
-
-            if (eye)
-                MelonLogger.Msg(EyeEnabled
-                    ? "Eye Tracking Initialized"
-                    : "Eye Tracking will be unavailable for this session.");
-
-            if (lip)
-            {
-                if (LipEnabled) MelonLogger.Msg("Lip Tracking Initialized");
-                else MelonLogger.Warning("Lip Tracking will be unavailable for this session.");
-            }
-
-            if (SceneManager.GetActiveScene().buildIndex == -1 && QuickModeMenu.MainMenu != null)
-                MainMod.MainThreadExecutionQueue.Add(() => QuickModeMenu.MainMenu.UpdateEnabledTabs(EyeEnabled, LipEnabled));
         }
 
         // Signal all active modules to gracefully shut down their respective runtimes

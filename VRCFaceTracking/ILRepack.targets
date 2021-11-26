@@ -1,0 +1,36 @@
+﻿<!-- ILRepack -->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Target Name="ILRepacker" AfterTargets="AfterBuild" BeforeTargets="CopyBuild">
+        <ItemGroup>
+            <InputAssemblies Include="$(OutputPath)\$(AssemblyName).dll" />
+            <!--Omnicept Libs-->
+            <InputAssemblies Include="$(MSBuildThisFileDirectory)\TrackingLibs\Omnicept\AsyncIO.dll" />
+            <InputAssemblies Include="$(MSBuildThisFileDirectory)\TrackingLibs\Omnicept\Google.Protobuf.dll" />
+            <InputAssemblies Include="$(MSBuildThisFileDirectory)\TrackingLibs\Omnicept\lib-client-csharp.dll" />
+            <InputAssemblies Include="$(MSBuildThisFileDirectory)\TrackingLibs\Omnicept\NetMQ.dll" />
+            <!--why is the built in SemanticVersionind.dll broken lmao?-->
+            <!--<InputAssemblies Include="$(MSBuildThisFileDirectory)\TrackingLibs\Omnicept\SemanticVersioning.dll" />-->
+            <InputAssemblies Include="$(MSBuildThisFileDirectory)\packages\SemanticVersioning.2.0.0\lib\net45\SemanticVersioning.dll" />
+            <InputAssemblies Include="$(MSBuildThisFileDirectory)\TrackingLibs\Omnicept\System.Buffers.dll" />
+            <InputAssemblies Include="$(MSBuildThisFileDirectory)\TrackingLibs\Omnicept\System.Memory.dll" />
+            <InputAssemblies Include="$(MSBuildThisFileDirectory)\TrackingLibs\Omnicept\System.Runtime.CompilerServices.Unsafe.dll" />
+            <!--Extra Libs-->
+            <InputAssemblies Include="$(MSBuildThisFileDirectory)\packages\System.Runtime.4.3.1\ref\net462\System.Runtime.dll" />
+        </ItemGroup>
+
+        <ItemGroup>
+            <LibraryPath Include="$(OutputPath)" />
+        </ItemGroup>
+
+        <ILRepack
+                Parallel="true"
+                Internalize="true"
+                InternalizeExclude="@(DoNotInternalizeAssemblies)"
+                InputAssemblies="@(InputAssemblies)"
+                LibraryPath="@(LibraryPath)"
+                TargetKind="Dll"
+                OutputFile="$(OutputPath)\$(AssemblyName).dll"
+        />
+    </Target>
+</Project>
+        <!-- /ILRepack -->

@@ -41,6 +41,7 @@
     <Compile Include="Params\Lip\LipParameter.cs" />
     <Compile Include="Params\Lip\LipShapeConversion.cs" />
     <Compile Include="Params\Lip\LipShapeMerger.cs" />
+    <Compile Include="TrackingLibs\Omnicept\OmniceptTrackingInterface.cs" />
     <Compile Include="TrackingLibs\Pimax\PimaxTracker.cs" />
     <Compile Include="TrackingLibs\Pimax\PimaxTrackingInterface.cs" />
     <Compile Include="TrackingLibs\SRanipal\Eye\SRanipal_Eye.cs" />
@@ -93,15 +94,48 @@
     <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
+    <Reference Include="AsyncIO, Version=0.1.25.0, Culture=neutral, PublicKeyToken=44a94435bd6f33f8">
+      <HintPath>TrackingLibs\Omnicept\AsyncIO.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Protobuf, Version=3.11.4.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604">
+      <HintPath>TrackingLibs\Omnicept\Google.Protobuf.dll</HintPath>
+    </Reference>
     <Reference Include="Il2Cppmscorlib, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Il2Cppmscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="lib-client-csharp, Version=1.12.0.3150, Culture=neutral, PublicKeyToken=null">
+      <HintPath>TrackingLibs\Omnicept\lib-client-csharp.dll</HintPath>
     </Reference>
     <Reference Include="MelonLoader, Version=0.4.3.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\MelonLoader.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="mscorlib" />
+    <Reference Include="NetMQ, Version=4.0.0.1, Culture=neutral, PublicKeyToken=a6decef4ddc58b3a">
+      <HintPath>TrackingLibs\Omnicept\NetMQ.dll</HintPath>
+    </Reference>
+    <Reference Include="SemanticVersioning, Version=2.0.0.0, Culture=neutral, PublicKeyToken=a89bb7dc6f7a145c">
+      <HintPath>packages\SemanticVersioning.2.0.0\lib\net45\SemanticVersioning.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
+      <HintPath>TrackingLibs\Omnicept\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
     <Reference Include="System.Diagnostics.Tracing" />
-    <Reference Include="UnhollowerBaseLib, Version=0.4.15.4, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
+      <HintPath>TrackingLibs\Omnicept\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime, Version=4.1.1.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>packages\System.Runtime.4.3.1\lib\net462\System.Runtime.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>TrackingLibs\Omnicept\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="UnhollowerBaseLib, Version=0.4.16.1, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnhollowerBaseLib.dll</HintPath>
     </Reference>
     <Reference Include="UnhollowerRuntimeLib, Version=0.4.10.0, Culture=neutral, PublicKeyToken=null">
@@ -154,12 +188,35 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="TrackingLibs" />
+    <Content Include="ILRepack.targets" />
+    <Content Include="TrackingLibs\Omnicept\AsyncIO.dll" />
+    <Content Include="TrackingLibs\Omnicept\Google.Protobuf.dll" />
+    <Content Include="TrackingLibs\Omnicept\lib-client-csharp.dll" />
+    <Content Include="TrackingLibs\Omnicept\NetMQ.dll" />
+    <Content Include="TrackingLibs\Omnicept\SemanticVersioning.dll" />
+    <Content Include="TrackingLibs\Omnicept\System.Buffers.dll" />
+    <Content Include="TrackingLibs\Omnicept\System.Memory.dll" />
+    <Content Include="TrackingLibs\Omnicept\System.Runtime.CompilerServices.Unsafe.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ReferencePathWithRefAssemblies Update="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\Facades\netstandard.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- Doesn't work with ILRepack
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(TargetDir)$(TargetName)$(TargetExt)" "D:\SteamLibrary\steamapps\common\VRChat\Mods" /Y</PostBuildEvent>
   </PropertyGroup>
+  -->
+  <Import Project="packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets" Condition="Exists('packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
     <Target Name="BeforeBuild">
