@@ -26,7 +26,7 @@ namespace VRCFaceTracking
             }
             catch (Exception ex)
             {
-                MelonLogger.Error("Patch Failed " + ex);
+                Logger.Error("Patch Failed", ex);
             }
         }
 
@@ -48,12 +48,12 @@ namespace VRCFaceTracking
                     //if (!av3Descriptor) return;
                     
                     //var (supportsEye, supportsLip) = UnifiedLibManager.GetAvatarSupportedTracking(av3Descriptor);
-                    //MelonLogger.Msg($"Player {avatarDescriptor.transform.parent.parent.GetComponent<VRCPlayer>().prop_String_0} : Lip {supportsLip}, Eye{supportsEye}");
+                    //Logger.Msg($"Player {avatarDescriptor.transform.parent.parent.GetComponent<VRCPlayer>().prop_String_0} : Lip {supportsLip}, Eye{supportsEye}");
                 }
                 else
                     UnifiedTrackingData.RefreshParameterList();
             }
-            catch (Exception e) { MelonLogger.Error(e.ToString()); }
+            catch (Exception e) { Logger.Error(e.ToString()); }
         }
 
         private delegate void AvatarInstantiatedDelegate(IntPtr @this, IntPtr avatarPtr, IntPtr avatarDescriptorPtr,

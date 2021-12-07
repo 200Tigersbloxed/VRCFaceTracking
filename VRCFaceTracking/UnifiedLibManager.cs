@@ -37,16 +37,16 @@ namespace VRCFaceTracking
         // Used when re-initializing modules, kills malfunctioning SRanipal process and restarts it. 
         public static IEnumerator CheckRuntimeSanity()
         {
-            MelonLogger.Msg("Checking Runtime Sanity...");
+            Logger.Msg("Checking Runtime Sanity...");
             EyeEnabled = false;
             LipEnabled = false;
             UsefulModules.Clear();
             foreach (var process in Process.GetProcessesByName("sr_runtime"))
             {
-                MelonLogger.Msg("Killing "+process.ProcessName);
+                Logger.Msg("Killing "+process.ProcessName);
                 process.Kill();
                 yield return new WaitForSeconds(3);
-                MelonLogger.Msg("Re-Initializing");
+                Logger.Msg("Re-Initializing");
                 Initialize();
             }
         }
@@ -65,7 +65,7 @@ namespace VRCFaceTracking
             // Return if VRChat\\Mods\\VRCFTLibs isn't a folder
             if (!Directory.Exists(MelonUtils.BaseDirectory + "\\Mods\\VRCFTLibs")) return returnList;
             
-            MelonLogger.Msg("Loading External Modules...");
+            Logger.Msg("Loading External Modules...");
 
             // Load dotnet dlls from the VRCFTLibs folder
             var dlls = Directory.GetFiles(Path.Combine(MelonUtils.BaseDirectory, "Mods\\VRCFTLibs"), "*.dll");
@@ -79,11 +79,11 @@ namespace VRCFaceTracking
                 if (module != null)
                 {
                     returnList.Add(module);
-                    MelonLogger.Msg("Loaded external tracking module: " + module.Name);
+                    Logger.Msg("Loaded external tracking module: " + module.Name);
                     continue;
                 }
                 
-                MelonLogger.Warning("Module " + dll + " does not implement ITrackingModule");
+                Logger.Warning("Module " + dll + " does not implement ITrackingModule");
             }
 
             return returnList;
@@ -122,14 +122,15 @@ namespace VRCFaceTracking
             }
 
             if (eye)
-                MelonLogger.Msg(EyeEnabled
-                    ? "Eye Tracking Initialized"
-                    : "Eye Tracking will be unavailable for this session.");
+            {
+                if(EyeEnabled) Logger.Msg("Eye Tracking Initialized");
+                else Logger.Warning("Eye Tracking will be unavailable for this session.");
+            }
 
             if (lip)
             {
-                if (LipEnabled) MelonLogger.Msg("Lip Tracking Initialized");
-                else MelonLogger.Warning("Lip Tracking will be unavailable for this session.");
+                if (LipEnabled) Logger.Msg("Lip Tracking Initialized");
+                else Logger.Warning("Lip Tracking will be unavailable for this session.");
             }
 
             if (SceneManager.GetActiveScene().buildIndex == -1 && QuickModeMenu.MainMenu != null)

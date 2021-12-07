@@ -63,7 +63,7 @@ namespace VRCFaceTracking
                     }
                     catch(Exception e)
                     {
-                        MelonLogger.Error($"Failed to get DLL: " + e.Message);
+                        Logger.Error($"Failed to get DLL: " + e.Message);
                     }
                 }
             }
@@ -83,7 +83,7 @@ namespace VRCFaceTracking
         private static void LoadAssembly(string path)
         {
             if (LoadLibrary(path) == IntPtr.Zero)
-                MelonLogger.Error("Unable to load library " + path);
+                Logger.Error("Unable to load library " + path);
         }
     }
 }
