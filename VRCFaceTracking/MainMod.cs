@@ -9,6 +9,7 @@ using VRCFaceTracking.QuickMenu;
 [assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.5.0", "benaclejames",
     "https://github.com/benaclejames/VRCFaceTracking")]
 [assembly: MelonGame("VRChat", "VRChat")]
+[assembly: VerifyLoaderVersion("0.4.3", true)]
 
 namespace VRCFaceTracking
 {
